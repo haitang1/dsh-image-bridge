@@ -23,13 +23,21 @@ DeepSeek 等文本模型不支持图片输入，DSH 的 api-proxy 会在发送�
 
 本包是 **profile bundle**（`package.json` 声明了 `dsh.bundle.patch`）。
 
-在 DSH 源码 checkout 根目录执行：
+在 DSH 源码 checkout 根目录执行。
+
+GitHub：
 
 ```sh
-pnpm dsh plugin --profile <profile> add 'github:<owner>/dsh-image-bridge#<commit>'
+pnpm dsh plugin --profile web add 'github:haitang1/dsh-image-bridge#b5c64ea'
 ```
 
-`<profile>` 通常是 `web`（Web 界面）；`<owner>` 换成你发布仓库的 owner；建议锁定 commit。
+Gitee：
+
+```sh
+pnpm dsh plugin --profile web add 'https://gitee.com/llhhtt/dsh-image-bridge.git#b5c64ea'
+```
+
+`<profile>` 通常是 `web`（Web 界面）；`#b5c64ea` 是当前建议锁定的提交，可换成仓库最新 commit。
 
 安装成功后，插件会自动加入该 profile 的 `dsh.profile.bundles`，下次启动（或长驻 surface
 热载后）生效。
@@ -39,7 +47,9 @@ pnpm dsh plugin --profile <profile> add 'github:<owner>/dsh-image-bridge#<commit
 如果 CLI 不可用：
 
 1. 编辑 `$DSH_HOME/profiles/<profile>/package.json`：
-   - 在 `dependencies` 加 `"dsh-image-bridge": "github:<owner>/dsh-image-bridge"`；
+   - 在 `dependencies` 加（GitHub / Gitee 二选一）：
+     - `"dsh-image-bridge": "github:haitang1/dsh-image-bridge#b5c64ea"`
+     - `"dsh-image-bridge": "https://gitee.com/llhhtt/dsh-image-bridge.git#b5c64ea"`
    - 在 `dsh.profile.bundles` 数组末尾加 `"dsh-image-bridge"`。
 2. 在该 profile 目录执行 `pnpm install`。
 
