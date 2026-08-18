@@ -19,6 +19,15 @@ DeepSeek 等文本模型不支持图片输入，DSH 的 api-proxy 会在发送�
    里追加一条「仅模型可见」的替换事件，把图片块在模型可见面换成 `[图片N]:"<路径>"`，
    而人类 transcript 仍渲染原图。首次调用会因适配器拒绝图片在本地失败（无 API 开销），随后自动重试。
 
+## 已知限制
+
+- **命令（`/` 开头）与图片不要在同一轮混用**：DSH 客户端输入框的「命令路径」提交时
+  （如 `/plan`、`/goal` 等）不会携带草稿图片，图片会留在输入框，需要再点一次发送。
+  这是 DSH 客户端（`dsh-client-ui-conversation` 的 `beginSubmit`）的限制，非本插件问题。
+  变通：先发命令，再单独发图；或命令与图片分开两条消息。
+- 会话历史中若残留视觉模型产生的图片块（未切换前），切回文本模型后这些历史图片不在本插件
+  处理范围，可能触发适配器报错；建议切回文本模型前清空或压缩历史。
+
 ## 安装
 
 本包是 **profile bundle**（`package.json` 声明了 `dsh.bundle.patch`）。
@@ -29,12 +38,6 @@ GitHub：
 
 ```sh
 pnpm dsh plugin --profile web add 'github:haitang1/dsh-image-bridge#b5c64ea'
-```
-
-Gitee：
-
-```sh
-pnpm dsh plugin --profile web add 'https://gitee.com/llhhtt/dsh-image-bridge.git#b5c64ea'
 ```
 
 `<profile>` 通常是 `web`（Web 界面）；`#b5c64ea` 是当前建议锁定的提交，可换成仓库最新 commit。
@@ -49,7 +52,6 @@ pnpm dsh plugin --profile web add 'https://gitee.com/llhhtt/dsh-image-bridge.git
 1. 编辑 `$DSH_HOME/profiles/<profile>/package.json`：
    - 在 `dependencies` 加（GitHub / Gitee 二选一）：
      - `"dsh-image-bridge": "github:haitang1/dsh-image-bridge#b5c64ea"`
-     - `"dsh-image-bridge": "https://gitee.com/llhhtt/dsh-image-bridge.git#b5c64ea"`
    - 在 `dsh.profile.bundles` 数组末尾加 `"dsh-image-bridge"`。
 2. 在该 profile 目录执行 `pnpm install`。
 
